@@ -11,7 +11,10 @@
   <!-- 文字の表示を真ん中に -->
   <body class="text-center">
     <h2>ファッションイメージ</h2>
-    <img src="{{ url_for('static', filename='/images/human_body.png') }}" class="human-body">
+    <div class="main-container">
+        <img src="{{ url_for('static', filename='/images/human_body.png') }}" class="human-body">
+        <img src="{{ url_for('static', filename='/images/yu.png') }}" class="mae-body">
+    </div>
   <!-- ボタンを押すと、/templatesに飛ぶ -->
   <form action="/templates" method="get">
     <input type="submit" value='Back' class="back-button">
