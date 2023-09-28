@@ -14,6 +14,7 @@ body {
     width: 400px;
     height: 600px;
 }
+
 .mae-body {
     position: absolute;
     top:5px;
@@ -28,8 +29,49 @@ body {
 }
 
 .back-button {
-    position: fixed;
-    top:700px;
     width: 100px;
     height: 50px;
+}
+
+.change-btn {
+
+    width: 100px;
+    height: 50px;
+
+}
+
+.btn-wrapper {
+    float: right;
+}
+
+ul {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+}
+
+li {
+    list-style: none;
+    float: left;
+    padding-left: 20px;
+}
+
+button img {
+    display: block;
+}
+
+button:active,
+button img {
+    position: relative;
+}
+
+.btns .change-btn {
+    height: 100px;
+    width: 100px;
+}
+
+.btns img {
+    position:relative;
+    height: 75px;
+    width: 75px;
 }

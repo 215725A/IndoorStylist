@@ -10,12 +10,33 @@
   </head>
   <!-- 文字の表示を真ん中に -->
   <body class="text-center">
-    <h2>ファッションイメージ</h2>
-    <img src="{{ url_for('static', filename='/images/human_body.png') }}" class="human-body">
-    <img src="{{ url_for('static', filename='/images/yu.png') }}" class="mae-body">
-  <!-- ボタンを押すと、/templatesに飛ぶ -->
-  <form action="/templates" method="get">
-    <input type="submit" value='Back' class="back-button">
-  </form>
+    <div class="main-wrapper">
+      <h2>ファッションイメージ</h2>
+      <div clas="image">
+        <img class ="human-body" src="{{ url_for('static', filename='/images/human_body.png') }}">
+        <img class = "mae-body" id="pics" src="{{ url_for('static', filename='/images/yu.png') }}" >
+      </div>
+      <!-- ボタンを押すと、/templatesに飛ぶ -->
+      <div class="btn-wrapper">
+        <ul>
+          <li>
+            <div class= "btns">
+              <button class = "change-btn"id="btn3" type="submit"><img src="{{ url_for('static', filename='images/yu.png')}}"></button>
+            </div>
+          </li>
+          <li>
+            <div class= "btns">
+              <button class = "change-btn"id="btn4" type="submit"><img src="{{ url_for('static', filename='images/m_clothes.png')}}"></button>
+            </div>
+          </li>
+          <li>
+            <form action="/templates" method="get">
+              <input type="submit" value='Back' class="back-button">
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
 </html>
