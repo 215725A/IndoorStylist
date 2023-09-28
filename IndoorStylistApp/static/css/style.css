@@ -9,16 +9,16 @@ body {
 
 .human-body {
     position: absolute;
-    top:130px;
-    left:500px;
+    top: 130px;
+    left: 500px;
     width: 400px;
     height: 600px;
 }
 
 .mae-body {
     position: absolute;
-    top:5px;
-    left:540px;
+    top: 5px;
+    left: 540px;
     width: 300px;
     height: 600px;
 }
@@ -44,16 +44,23 @@ body {
     float: right;
 }
 
-ul {
+.ul-1 {
     position: absolute;
-    top: 50%;
+    right: 20%;
+}
+
+.ul-2 {
+    position: absolute;
     right: 10%;
+}
+
+ul {
+    float: left;
 }
 
 li {
     list-style: none;
-    float: left;
-    padding-left: 20px;
+    padding-top: 10px;
 }
 
 button img {
@@ -74,4 +81,28 @@ button img {
     position:relative;
     height: 75px;
     width: 75px;
+}
+
+.f-clothes {
+    position: absolute;
+    top: 175px;
+    left: 540px;
+    width: 300px;
+    height: 600px;
+}
+
+.t-clothes {
+    position: absolute;
+    top: 175px;
+    left: 550px;
+    width: 300px;
+    height: 600px; 
+}
+
+.makima-clothes {
+    position: absolute;
+    top: 75px;
+    left: 550px;
+    width: 300px;
+    height: 600px; 
 }
