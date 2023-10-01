@@ -12,3 +12,6 @@ def home():
 @app.route('/nextpage', methods=['GET'])
 def stylePage():
     return render_template('IndoorStylistApp/StyleCheck.html')
+@app.route('/thirdpage', methods=['GET'])
+def samplePage():
+    return render_template('IndoorStylistApp/threeModel.html')
