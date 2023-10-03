@@ -15,4 +15,4 @@ def stylePage():
 
 @app.route('/thirdpage', methods=['GET'])
 def samplePage():
-    return render_template('IndoorStylistApp/threeModel.html')
+    return render_template('IndoorStylistApp/ThreeModel.html')
