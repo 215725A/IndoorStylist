@@ -18,7 +18,6 @@
     <script type="importmap">
       {
         "imports": {
-          //three.module.jsは書き換えない
           "three": "./static/js/three.module.js"
         }
       }
@@ -76,5 +75,9 @@
 
       animate();
     </script>
+    <canvas id="myCanvas"></canvas>
+        <form action="/templates" method="get">
+            <input type="submit" value='Back' class="back-button">
+        </form>
   </body>
 </html>
