@@ -2,6 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Load a 3D model</title>
     <style>
@@ -11,9 +12,6 @@
         flex-direction: column;
         height:100px;
         overflow:hidden;
-      }
-      canvas {
-        felx-grow: 1;
       }
       .back-button-container {
         text-align: center;
@@ -48,7 +46,6 @@
       import { OrbitControls } from './static/js/OrbitControls.js';
 
       var scene = new THREE.Scene();
-
       var camera = new THREE.PerspectiveCamera(
         50,
         window.innerWidth / window.innerHeight,
@@ -56,7 +53,7 @@
         1000
       );
 
-      var renderer = new THREE.WebGLRenderer({ antialias: true });
+      var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -94,7 +91,6 @@
       animate();
     </script>
 
-    <!-- 追加のコード：Canvas要素と戻るボタンのフォーム -->
    <div class="back-button-container">
     <form action="/templates" method="get">
       <input type="submit" value='Back' class="back-button">
