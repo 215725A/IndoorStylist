@@ -1,34 +1,12 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Load a 3D model</title>
-    <style>
-      .back-button-container {
-        text-align: center;
-        padding: 10px;
-      }
+{% extends "partial/_base.html" %}
 
-      .back-button {
-        border: 1px soild #333;
-        padding: 10px 20px;
-        cursor: pointer;
-      }
-      .sample {
-        width: 10px;
-        height: 20px;
-        margin:10px auto;
-        overflow:hidden;
-      }
-    </style>
-  </head>
-  <body>
-    <script
-      async
-      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-    ></script>
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/threemodel.css') }}">
+{% endblock %}
+
+{% block content %}
 
     <script type="importmap">
       {
@@ -37,65 +15,64 @@
         }
       }
     </script>
-    <div id ="sample">
-      <script type="module">
-        import * as THREE from 'three';
+    <script type="module">
+      import * as THREE from 'three';
 
-        import { MTLLoader } from './static/js/MTLLoader.js';
-        import { OBJLoader } from './static/js/OBJLoader.js';
-        import { OrbitControls } from './static/js/OrbitControls.js';
+      import { MTLLoader } from './static/js/MTLLoader.js';
+      import { OBJLoader } from './static/js/OBJLoader.js';
+      import { OrbitControls } from './static/js/OrbitControls.js';
 
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(
-          50,
-          window.innerWidth / window.innerHeight,
-          1,
-          1000
-        );
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        50,
+        window.innerWidth / window.innerHeight,
+        1,
+        1000
+      );
 
-        var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
 
-        document.body.appendChild(renderer.domElement);
+      document.body.appendChild(renderer.domElement);
 
-        var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
-        scene.add(ambientLight);
+      var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
+      scene.add(ambientLight);
 
-        camera.position.z = 250;
+      camera.position.z = 250;
 
-        var controls = new OrbitControls(camera, renderer.domElement);
+      var controls = new OrbitControls(camera, renderer.domElement);
 
-        new MTLLoader()
-          .setPath('./static/obj/male02/')
-          .load('male02.mtl', function (materials) {
-            materials.preload();
+      new MTLLoader()
+        .setPath('./static/obj/male02/')
+        .load('male02.mtl', function (materials) {
+          materials.preload();
 
-            new OBJLoader()
-              .setPath('./static/obj/male02/')
-              .setMaterials(materials)
-              .load('male02.obj', function (object) {
-                object.position.y = -95;
-                scene.add(object);
-              });
-          });
+          new OBJLoader()
+            .setPath('./static/obj/male02/')
+            .setMaterials(materials)
+            .load('male02.obj', function (object) {
+              object.position.y = -95;
+              scene.add(object);
+            });
+        });
 
-        // /* 繰り返しの処理　*/
+      // /* 繰り返しの処理　*/
 
-        var animate = function () {
-          requestAnimationFrame(animate);
+      var animate = function () {
+        requestAnimationFrame(animate);
 
-          renderer.render(scene, camera);
-        };
+        renderer.render(scene, camera);
+      };
 
-        animate();
-      </script>
-    </div>  
+      animate();
+    </script>
 
-   <div class="back-button-container">
+  <div class="back-button-container">
     <form action="/templates" method="get">
       <input type="submit" value='Back' class="back-button">
     </form>
-  </div>  
-  </body>
-</html>
+  </div>
+
+  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+{% endblock %}

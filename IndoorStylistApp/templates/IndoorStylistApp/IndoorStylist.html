@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "partial/_base.html" %}
+
+{% block head %}
+    {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>IndoorStylist</title>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
     <h1>IndoorStylist</h1>
     <h2>お家に居ながらファッションショー??</h2>
     <img src="{{ url_for('static', filename='/images/icon.png') }}" class="logo">
@@ -19,5 +17,4 @@
     <form action="/thirdpage" method="get">
         <input type="submit" value="3DModel" class="start-button">
     </form>
-</body>
-</html>
+{% endblock %}
