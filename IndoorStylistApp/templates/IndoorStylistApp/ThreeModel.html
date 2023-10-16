@@ -42,21 +42,50 @@
       camera.position.z = 250;
 
       var controls = new OrbitControls(camera, renderer.domElement);
+      var currentModel = null;
+      var currentModel1 = null;
 
-      new MTLLoader()
-        .setPath('./static/obj/male02/')
-        .load('male02.mtl', function (materials) {
-          materials.preload();
 
-          new OBJLoader()
-            .setPath('./static/obj/male02/')
-            .setMaterials(materials)
-            .load('male02.obj', function (object) {
-              object.position.y = -95;
-              scene.add(object);
-            });
-        });
+      function loadNewMode1() {
+        if (currentModel) {
+          scene.remove(currentModel);
+        }
 
+        new MTLLoader()
+          .setPath('./static/obj/male02/')
+          .load('male02.mtl', function (materials) {
+            materials.preload();
+
+            new OBJLoader()
+              .setPath('./static/obj/male02/')
+              .setMaterials(materials)
+              .load('male02.obj', function (object) {
+                object.position.y = -95;
+                scene.add(object);
+              });
+          });
+      }
+      function loadNewMode2() {
+        if (currentModel1) {
+          scene.remove(currentModel1);
+        }
+
+        new MTLLoader()
+          .setPath('./static/obj/female02/')
+          .load('female02.mtl', function (materials) {
+            materials.preload();
+
+            new OBJLoader()
+              .setPath('./static/obj/female02/')
+              .setMaterials(materials)
+              .load('female02.obj', function (object) {
+                object.position.y = -95;
+                scene.add(object);
+              });
+          });
+      }    
+      document.getElementById("changeManButton").addEventListener("click", loadNewMode1);
+      document.getElementById("changeWomanButton").addEventListener("click", loadNewMode2);
       // /* 繰り返しの処理　*/
 
       var animate = function () {
@@ -73,6 +102,12 @@
       <input type="submit" value='Back' class="back-button">
     </form>
   </div>
+  <div>
+    <button id="changeManButton">Change ManModel</button>
+  </div> 
+  <div>
+    <button id="changeWomanButton">Change WomanModel</button>
+  </div>   
 
   <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 {% endblock %}
