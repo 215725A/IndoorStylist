@@ -18,111 +18,82 @@
     <script type="module">
       import * as THREE from 'three';
 
-      import { MTLLoader } from './static/js/MTLLoader.js';
-      import { OBJLoader } from './static/js/OBJLoader.js';
+      import { GLTFLoader } from './static/js/GLTFLoader.js';
       import { OrbitControls } from './static/js/OrbitControls.js';
+      let camera, scene, renderer;
 
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(
-        50,
-        window.innerWidth / window.innerHeight,
-        1,
-        1000
-      );
+			init();
+			render();
 
-      var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
+			function init() {
 
-      document.body.appendChild(renderer.domElement);
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-      var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
-      scene.add(ambientLight);
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
 
-      camera.position.z = 250;
+				scene = new THREE.Scene();
 
-      var controls = new OrbitControls(camera, renderer.domElement);
-      var currentModel = null;
-      var currentModelPath = ''; // 現在のモデルのパス
-      var currentModelMTL = ''; // 現在のモデルのMTLファイル名
-      var currentModelOBJ = ''; // 現在のモデルのOBJファイル名
 
-      function loadModel(modelPath, mtlFile, objFile) {
-        // モデルがすでに表示されている場合、一旦削除
-        if (currentModel) {
-          scene.remove(currentModel);
-          currentModel = null;
-        }
+						// model
 
-        currentModelPath = modelPath;
-        currentModelMTL = mtlFile;
-        currentModelOBJ = objFile;
+				const loader = new GLTFLoader().setPath( './static/glb/' );
+				loader.load( 'Flower.glb', function ( gltf ) {
 
-        new MTLLoader()
-          .setPath(currentModelPath)
-          .load(currentModelMTL, function (materials) {
-            materials.preload();
+          scene.add( gltf.scene );
 
-            new OBJLoader()
-              .setPath(currentModelPath)
-              .setMaterials(materials)
-              .load(currentModelOBJ, function (object) {
-                object.position.y = -95;
-                currentModel = object; // モデルを変数に設定
-                // モデルをシーンに追加
-                scene.add(currentModel);
-                renderer.render(scene, camera); // モデルが追加されたら再描画
-              });
-          });
-      }
+          render();
+        } ) ;  
 
-      function clearModel() {
-        if (currentModel) {
-          scene.remove(currentModel);
-          currentModel = null;
-          currentModelPath = ''; 
-          currentModelMTL = ''; 
-          currentModelOBJ = ''; 
-        }
-      }   
-      document.getElementById("changeManButton").addEventListener("click", function() {
-        loadModel('./static/obj/male02/', 'male02.mtl', 'male02.obj');
-      });
-      document.getElementById("changeWomanButton").addEventListener("click", function() {
-        loadModel('./static/obj/female02/', 'female02.mtl', 'female02.obj');
-      });
-      document.getElementById("changeSampleButton").addEventListener("click", function() {
-        loadModel('./static/obj/sample/', 'sample.mtl','sample.obj');
-      });
-      document.getElementById("clearModelButton").addEventListener("click", clearModel);
-      // /* 繰り返しの処理　*/
 
-      var animate = function () {
-        requestAnimationFrame(animate);
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				container.appendChild( renderer.domElement );
 
-        renderer.render(scene, camera);
-      };
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
 
-      animate();
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			//
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
     </script>
+
+
 
   <div class="back-button-container">
     <form action="/templates" method="get">
       <input type="submit" value='Back' class="back-button">
     </form>
   </div>
-  <div>
-    <button id="changeManButton">Change ManModel</button>
-  </div> 
-  <div>
-    <button id="changeWomanButton">Change WomanModel</button>
-  </div> 
-  <div>
-    <button id="changeSampleButton">Change SampleModel</button>
-  </div> 
-  <div>
-    <button id="clearModelButton">Clear Model</button>
-  </div>      
+
 
   <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 {% endblock %}
