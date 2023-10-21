@@ -1,100 +1,88 @@
-{% extends "partial/_base.html" %}
-
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/threemodel.css') }}">
-{% endblock %}
-
-{% block content %}
-
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "./static/js/three.module.js"
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>blender読み込みサンプル</title>
+    
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
         }
-      }
-    </script>
-    <script type="module">
-      import * as THREE from 'three';
+     
+    </style>
+</head>
+<body>
 
-      import { GLTFLoader } from './static/js/GLTFLoader.js';
-      import { OrbitControls } from './static/js/OrbitControls.js';
-      let camera, scene, renderer;
+    <div id="WebGL-output">
+    </div>
 
-			init();
-			render();
+<script type="module">
+    import * as THREE from'https://unpkg.com/three@0.126.1/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.126.1/examples/jsm/controls/OrbitControls.js';
+    import { GLTFLoader } from 'https://unpkg.com/three@0.126.1/examples/jsm/loaders/GLTFLoader.js';
 
-			function init() {
+    let camera;
+    let scene;
+    let renderer;
+    let model;
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
+    init();
+    animate();
+    
+    function init() {
+        //シーンの作成
+        scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.6, 2.7 );
+        //カメラの作成
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        //カメラセット
+        camera.position.set(-20, 30, 50);
+        camera.lookAt(new THREE.Vector3(0, 10, 0));
+        
+         // 滑らかにカメラコントローラーを制御する
+        const controls = new OrbitControls(camera, document.body);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.2;
 
-				scene = new THREE.Scene();
+        //光源
+        const dirLight = new THREE.SpotLight(0xffffff,1.5);//color,強度
+        dirLight.position.set(-20, 30, 30);
+        scene.add(dirLight);
 
+        //レンダラー
+        renderer = new THREE.WebGLRenderer({ 
+            alpha: true,
+            antialias: true
+        });
+        renderer.setClearColor(new THREE.Color(0xffffff));
+        renderer.setSize(window.innerWidth, window.innerHeight);
 
-						// model
+        //glbファイルの読み込み
+        const loader = new GLTFLoader();
 
-				const loader = new GLTFLoader().setPath( './static/glb/' );
-				loader.load( 'Flower.glb', function ( gltf ) {
+        loader.load('./static/glb/sano-uni.glb', function(gltf) {
+            model = gltf.scene;
+            model.traverse((object) => { //モデルの構成要素
+                if(object.isMesh) { //その構成要素がメッシュだったら
+                object.material.trasparent = true;//透明許可
+                object.material.opacity = 0.8;//透過
+                object.material.depthTest = true;//陰影で消える部分
+                }})
+            scene.add(model);
+        }, undefined, function(e) {
+            console.error(e);
+        });
 
-          scene.add( gltf.scene );
-
-          render();
-        } ) ;  
-
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
-				container.appendChild( renderer.domElement );
-
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 2;
-				controls.maxDistance = 10;
-				controls.target.set( 0, 0, - 0.2 );
-				controls.update();
-
-				window.addEventListener( 'resize', onWindowResize );
-
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
-
-			}
-
-			//
-
-			function render() {
-
-				renderer.render( scene, camera );
-
-			}
-
-    </script>
-
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+    }
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
 
 
-  <div class="back-button-container">
-    <form action="/templates" method="get">
-      <input type="submit" value='Back' class="back-button">
-    </form>
-  </div>
+</script>
 
 
-  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-{% endblock %}
+</body>
+</html>
