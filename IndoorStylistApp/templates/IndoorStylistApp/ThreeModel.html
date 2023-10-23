@@ -8,103 +8,313 @@
 
 {% block content %}
 
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "./static/js/three.module.js"
-        }
+  <div id="container"></div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./static/js/three.module.js"
       }
-    </script>
-    <script type="module">
-      import * as THREE from 'three';
+    }
+  </script>
 
-      import { MTLLoader } from './static/js/MTLLoader.js';
-      import { OBJLoader } from './static/js/OBJLoader.js';
-      import { OrbitControls } from './static/js/OrbitControls.js';
+  <script type="module">
+    import * as THREE from 'three';
 
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(
-        50,
-        window.innerWidth / window.innerHeight,
-        1,
-        1000
-      );
+    import { MTLLoader } from './static/js/MTLLoader.js';
+    import { GLTFLoader } from './static/js/GLTFLoader.js';
+    import { OBJLoader } from './static/js/OBJLoader.js';
+    import { GUI } from './static/js/lil-gui.module.min.js';
+    import { OrbitControls } from './static/js/OrbitControls.js';
 
-      var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(
+      50,
+      window.innerWidth / window.innerHeight,
+      1,
+      1000
+    );
 
-      document.body.appendChild(renderer.domElement);
+    var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-      var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
-      scene.add(ambientLight);
+    document.body.appendChild(renderer.domElement);
 
-      camera.position.z = 250;
+    var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
+    scene.add(ambientLight);
 
-      var controls = new OrbitControls(camera, renderer.domElement);
-      var currentModel = null;
-      var currentModelPath = ''; // 現在のモデルのパス
-      var currentModelMTL = ''; // 現在のモデルのMTLファイル名
-      var currentModelOBJ = ''; // 現在のモデルのOBJファイル名
+    camera.position.z = 250;
 
-      function loadModel(modelPath, mtlFile, objFile) {
-        // モデルがすでに表示されている場合、一旦削除
-        if (currentModel) {
-          scene.remove(currentModel);
-          currentModel = null;
+    var controls = new OrbitControls(camera, renderer.domElement);
+    var currentModel = null;
+    var currentModelPath = ''; // 現在のモデルのパス
+    var currentModelMTL = ''; // 現在のモデルのMTLファイル名
+    var currentModelOBJ = ''; // 現在のモデルのOBJファイル名
+
+		let model, skeleton, mixer, clock;
+
+    const crossFadeControls = [];
+
+    let currentBaseAction = 'idle';
+    const allActions = [];
+    const baseActions = {
+      idle: { weight: 1 },
+      walk: { weight: 0 }
+    };
+
+    const allModels = {
+        None:   function() { clearModel(); },
+        Man:    function() { loadModel('./static/obj/male02/', 'male02.mtl', 'male02.obj'); },
+        Woman:  function() { loadModel('./static/obj/female02/', 'female02.mtl', 'female02.obj'); }, 
+        Sample: function() { loadModel('./static/obj/sample/', 'sample.mtl','sample.obj'); },
+        Clear:  function() { clearModel(); }
+    };
+
+    let panelSettings, numAnimations;
+
+    init();
+
+    // 初期化関数
+    function init() {
+      const container = document.getElementById( 'container' );
+      const loader = new GLTFLoader();
+      clock = new THREE.Clock();
+
+      loader.load( './static/obj/human_sample/Xbot.glb', function( gltf ) {
+        model = gltf.scene;
+        model.scale.set(90, 90, 90);
+        model.position.set(0, -60, 0);
+        scene.add( model );
+
+        currentModel = gltf;
+
+        model.traverse( function ( object ) {
+          if ( object.isMesh ) object.castShadow = true;
+        } );
+
+        skeleton = new THREE.SkeletonHelper( model );
+        skeleton.visible = false;
+        scene.add(skeleton);
+
+        const animations = gltf.animations;
+        mixer = new THREE.AnimationMixer( model );
+
+        numAnimations = animations.length;
+
+        for ( let i=0; i !== numAnimations; ++ i) {
+          let clip = animations[ i ];
+          const name = clip.name;
+
+          if ( baseActions[ name ] ) {
+            const action = mixer.clipAction( clip );
+            baseActions[ name ].action = action;
+            activateAction( action );
+            allActions.push( action );
+          }
         }
+        
+        createPanel();
 
-        currentModelPath = modelPath;
-        currentModelMTL = mtlFile;
-        currentModelOBJ = objFile;
-
-        new MTLLoader()
-          .setPath(currentModelPath)
-          .load(currentModelMTL, function (materials) {
-            materials.preload();
-
-            new OBJLoader()
-              .setPath(currentModelPath)
-              .setMaterials(materials)
-              .load(currentModelOBJ, function (object) {
-                object.position.y = -95;
-                currentModel = object; // モデルを変数に設定
-                // モデルをシーンに追加
-                scene.add(currentModel);
-                renderer.render(scene, camera); // モデルが追加されたら再描画
-              });
-          });
-      }
-
-      function clearModel() {
-        if (currentModel) {
-          scene.remove(currentModel);
-          currentModel = null;
-          currentModelPath = ''; 
-          currentModelMTL = ''; 
-          currentModelOBJ = ''; 
-        }
-      }   
-      document.getElementById("changeManButton").addEventListener("click", function() {
-        loadModel('./static/obj/male02/', 'male02.mtl', 'male02.obj');
+        animate();
       });
-      document.getElementById("changeWomanButton").addEventListener("click", function() {
-        loadModel('./static/obj/female02/', 'female02.mtl', 'female02.obj');
-      });
-      document.getElementById("changeSampleButton").addEventListener("click", function() {
-        loadModel('./static/obj/sample/', 'sample.mtl','sample.obj');
-      });
-      document.getElementById("clearModelButton").addEventListener("click", clearModel);
-      // /* 繰り返しの処理　*/
 
-      var animate = function () {
-        requestAnimationFrame(animate);
+    }
 
-        renderer.render(scene, camera);
+    function activateAction( action ) {
+      const clip = action.getClip();
+      const settings = baseActions[ clip.name ];
+      setWeight( action, settings.weight);
+      action.play();
+    }
+
+    function setWeight( action, weight ) {
+      action.enabled = true;
+      action.setEffectiveTimeScale( 1 );
+      action.setEffectiveWeight( weight );
+    }
+
+    function createPanel() {
+      const panel = new GUI( { width: 310 } );
+      const models = panel.addFolder( 'Models' );
+      const folder = panel.addFolder( 'Base Actions' );
+      
+      panelSettings = {
+        'modify time scale' : 1.0
       };
 
-      animate();
-    </script>
+      const baseNames = [ 'None', ...Object.keys( baseActions ) ];
+      const modelNames = [ ...Object.keys( allModels ) ];
+
+      for (let i=0, l=modelNames.length; i !== l; ++i) {
+        const name = modelNames[ i ];
+        models.add( allModels, name );
+      }
+
+      for (let i=0, l=baseNames.length; i !== l; ++i) {
+        const name = baseNames[ i ];
+        const settings = baseActions[ name ];
+
+        panelSettings[ name ] = function() {
+          const currentSettings = baseActions[ currentBaseAction ];
+          const currentAction = currentSettings ? currentSettings.action : null;
+          const action = settings ? settings.action : null;
+
+          if ( currentAction !== action ) {
+            prepareCrossFade( currentAction, action, 0.35 );
+          }
+        };
+
+        crossFadeControls.push( folder.add( panelSettings, name ) );
+      }
+
+      models.open();
+      folder.open(); // フォルダを開く
+
+
+      crossFadeControls.forEach(function( control ) {
+        control.setInactive = function() {
+          control.domElement.classList.add( 'control-inactive' );
+        };
+
+        control.setActive = function() {
+          control.domElement.classList.remove( 'control-inactive' );
+        };
+
+        const settings = baseActions[ control.property ];
+      });
+    }
+
+    function prepareCrossFade( startAction, endAction, duration ) {
+      if ( currentBaseAction === 'idle' || ! startAction || ! endAction ) {
+        executeCrossFade( startAction, endAction, duration );
+      } else {
+        synchronizedCrossFade( startAction, endAction, duration );
+      }
+
+      if ( endAction ) {
+        const clip = endAction.getClip();
+        currentBaseAction = clip.name;
+      } else {
+        currentBaseAction = 'None';
+      }
+
+      crossFadeControls.forEach(function (control) {
+        const name = control.property;
+
+        if ( name === currentBaseAction ) {
+          control.setActive();
+        } else {
+          control.setInactive();
+        }
+      });
+    }
+
+    function synchronizedCrossFade( startAction, endAction, duration ) {
+      mixer.addEventListener( 'loop', onLoopFinished );
+
+      function onLoopFinished( event ) {
+        if ( event.action === startAction ) {
+          mixer.removeEventListener( 'loop', onLoopFinished );
+          executeCrossFade( startAction, endAction, duration );
+        }
+      }
+    }
+
+    function executeCrossFade( startAction, endAction, duration ) {
+      if ( endAction ) {
+        setWeight( endAction, 1);
+        endAction.time = 0;
+
+        if ( startAction ) {
+          startAction.crossFadeTo( endAction, duration, true);
+        } else {
+          endAction.fadeIn( duration );
+        }
+
+      } else {
+        startAction.fadeOut( duration );
+      }
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    function loadModel(modelPath, mtlFile, objFile) {
+      // モデルがすでに表示されている場合、一旦削除
+      if (currentModel) {
+        scene.remove(currentModel);
+        currentModel = null;
+      }
+
+      currentModelPath = modelPath;
+      currentModelMTL = mtlFile;
+      currentModelOBJ = objFile;
+
+      new MTLLoader()
+        .setPath(currentModelPath)
+        .load(currentModelMTL, function (materials) {
+          materials.preload();
+
+          new OBJLoader()
+            .setPath(currentModelPath)
+            .setMaterials(materials)
+            .load(currentModelOBJ, function (object) {
+              object.position.y = -60;
+              currentModel = object; // モデルを変数に設定
+              const geometory = object.children[0].geometory;
+              // モデルをシーンに追加
+              scene.add(currentModel);
+              renderer.render(scene, camera); // モデルが追加されたら再描画
+            });
+        });
+    }
+
+    function clearModel() {
+      if (currentModel) {
+        scene.remove(currentModel);
+        currentModel = null;
+        currentModelPath = ''; 
+        currentModelMTL = ''; 
+        currentModelOBJ = ''; 
+      }
+    }   
+    document.getElementById("changeManButton").addEventListener("click", function() {
+      loadModel('./static/obj/male02/', 'male02.mtl', 'male02.obj');
+    });
+    document.getElementById("changeWomanButton").addEventListener("click", function() {
+      loadModel('./static/obj/female02/', 'female02.mtl', 'female02.obj');
+    });
+    document.getElementById("changeSampleButton").addEventListener("click", function() {
+      loadModel('./static/obj/sample/', 'sample.mtl','sample.obj');
+    });
+    document.getElementById("clearModelButton").addEventListener("click", clearModel);
+    // /* 繰り返しの処理　*/
+
+    function animate() {
+      requestAnimationFrame(animate);
+      // renderer.render(scene, camera);
+
+      for ( let i=0; i !== allActions.length; ++i ) {
+        const action = allActions[ i ];
+        const clip = action.getClip();
+        const settings = baseActions[ clip.name ];
+
+        settings.weight = action.getEffectiveWeight();
+      }
+
+      const mixerUpdateDelta = clock.getDelta();
+
+      mixer.update( mixerUpdateDelta );
+
+      renderer.render( scene, camera );
+    };
+
+  </script>
 
   <div class="back-button-container">
     <form action="/templates" method="get">
