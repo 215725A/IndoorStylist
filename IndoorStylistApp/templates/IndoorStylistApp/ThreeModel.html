@@ -17,9 +17,7 @@
     </script>
     <script type="module">
       import * as THREE from 'three';
-
-      import { MTLLoader } from './static/js/MTLLoader.js';
-      import { OBJLoader } from './static/js/OBJLoader.js';
+      import { GLTFLoader } from './static/js/GLTFLoader.js';
       import { OrbitControls } from './static/js/OrbitControls.js';
 
       var scene = new THREE.Scene();
@@ -30,24 +28,19 @@
         1000
       );
 
-      var renderer = new THREE.WebGLRenderer({ antialias: true ,alpha:true});
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       document.body.appendChild(renderer.domElement);
-
-      var ambientLight = new THREE.AmbientLight(0xcccccc, 4);
-      scene.add(ambientLight);
 
       camera.position.z = 250;
 
       var controls = new OrbitControls(camera, renderer.domElement);
       var currentModel = null;
       var currentModelPath = ''; // 現在のモデルのパス
-      var currentModelMTL = ''; // 現在のモデルのMTLファイル名
-      var currentModelOBJ = ''; // 現在のモデルのOBJファイル名
 
-      function loadModel(modelPath, mtlFile, objFile) {
+      function loadModel(modelPath, glbFile) {
         // モデルがすでに表示されている場合、一旦削除
         if (currentModel) {
           scene.remove(currentModel);
@@ -55,24 +48,14 @@
         }
 
         currentModelPath = modelPath;
-        currentModelMTL = mtlFile;
-        currentModelOBJ = objFile;
 
-        new MTLLoader()
+        new GLTFLoader()
           .setPath(currentModelPath)
-          .load(currentModelMTL, function (materials) {
-            materials.preload();
-
-            new OBJLoader()
-              .setPath(currentModelPath)
-              .setMaterials(materials)
-              .load(currentModelOBJ, function (object) {
-                object.position.y = -95;
-                currentModel = object; // モデルを変数に設定
-                // モデルをシーンに追加
-                scene.add(currentModel);
-                renderer.render(scene, camera); // モデルが追加されたら再描画
-              });
+          .load(glbFile, function (gltf) {
+            currentModel = gltf.scene; // モデルを変数に設定
+            // モデルをシーンに追加
+            scene.add(currentModel);
+            renderer.render(scene, camera); // モデルが追加されたら再描画
           });
       }
 
@@ -80,22 +63,20 @@
         if (currentModel) {
           scene.remove(currentModel);
           currentModel = null;
-          currentModelPath = ''; 
-          currentModelMTL = ''; 
-          currentModelOBJ = ''; 
+          currentModelPath = '';
         }
-      }   
-      document.getElementById("changeManButton").addEventListener("click", function() {
-        loadModel('./static/obj/male02/', 'male02.mtl', 'male02.obj');
+      }
+
+      document.getElementById("changeManButton").addEventListener("click", function () {
+        loadModel('./static/obj/human_sample/', 'sano-2.glb');
       });
-      document.getElementById("changeWomanButton").addEventListener("click", function() {
-        loadModel('./static/obj/female02/', 'female02.mtl', 'female02.obj');
+      document.getElementById("changeWomanButton").addEventListener("click", function () {
+        loadModel('./static/obj/human_sample/', 'sano-uni.glb');
       });
-      document.getElementById("changeSampleButton").addEventListener("click", function() {
-        loadModel('./static/obj/sample/', 'human.mtl','human.obj');
+      document.getElementById("changeSampleButton").addEventListener("click", function () {
+        loadModel('./static/obj/human_sample/', 'Xbot.glb');
       });
       document.getElementById("clearModelButton").addEventListener("click", clearModel);
-      // /* 繰り返しの処理　*/
 
       var animate = function () {
         requestAnimationFrame(animate);
