@@ -1,0 +1,52 @@
+{% extends "partial/_base.html" %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+  <div class="main-Model">
+    <h2>モデルの選択はこちら</h2>
+    <div class="btn-wrapper">
+      <div class="ul-1">
+        <ul>
+          <li>
+            <form action="/Fourpage" method="get">
+                <input type="submit" value="3DModel_B" class="change-btn">
+            </form>
+          </li>
+          <li>
+            <form action="/Fourpage" method="get">
+                <input type="submit" value="3DModel_B" class="change-btn">
+            </form>
+          </li>
+          <li>
+            <form action="/Fourpage" method="get">
+                <input type="submit" value="3DModel_B" class="change-btn">
+            </form>
+          </li>
+          <li>
+            <form action="/Fourpage" method="get">
+                <input type="submit" value="3DModel_A" class="change-btn">
+            </form>
+          </li>
+        </ul>
+      </div>
+      <div class="ul-2">
+        <ul>
+          <li>
+            <form action="/Fourpage" method="get">
+                <input type="submit" value="3DModel_B" class="change-btn">
+            </form>
+          </li>
+          <li>
+            <form action="/templates" method="get">
+              <input type="submit" value='Back' class="back-button">
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

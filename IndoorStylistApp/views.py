@@ -14,6 +14,10 @@ def stylePage():
     return render_template('IndoorStylistApp/StyleCheck.html')
 
 @app.route('/thirdpage', methods=['GET'])
+def choicePage():
+    return render_template('IndoorStylistApp/ModelChoice.html')
+
+@app.route('/Fourpage', methods=['GET'])
 def samplePage():
     return render_template('IndoorStylistApp/ThreeModel.html')
 
