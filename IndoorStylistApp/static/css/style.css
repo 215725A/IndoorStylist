@@ -39,6 +39,12 @@ body {
     height: 50px;
 
 }
+.change1-btn {
+    top: 5px;
+    left: 540px;
+    width: 300px;
+    height: 600px;
+}
 
 .btn-wrapper {
     float: right;
@@ -53,14 +59,21 @@ body {
     position: absolute;
     right: 10%;
 }
+.ul-3 {
+    position: absolute;
+    right: 60%;
+}
+
 
 ul {
-    float: left;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 li {
     list-style: none;
     padding-top: 10px;
+    display: inline-block;
 }
 
 button img {
