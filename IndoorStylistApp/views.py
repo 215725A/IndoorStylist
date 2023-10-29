@@ -20,6 +20,9 @@ def choicePage():
 @app.route('/Fourpage', methods=['GET'])
 def samplePage():
     return render_template('IndoorStylistApp/ThreeModel.html')
+@app.route('/Fifthpage', methods=['GET'])
+def ClothePage():
+    return render_template('IndoorStylistApp/ClothesChoice.html')
 
 @app.route('/test', methods=['GET'])
 def testPage():
