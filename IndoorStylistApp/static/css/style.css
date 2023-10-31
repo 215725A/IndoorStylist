@@ -39,6 +39,7 @@ body {
     height: 50px;
 
 }
+
 .change1-btn {
     top: 5px;
     left: 540px;
@@ -59,6 +60,7 @@ body {
     position: absolute;
     right: 10%;
 }
+
 .ul-3 {
     position: absolute;
     right: 60%;
@@ -122,5 +124,20 @@ button img {
 
 .hidden-form {
     display: none;
-  }
+}
 
+.sano {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#sano-2 {
+    background-image: url('../images/sano-2.png');
+}
+
+#sano-uni {
+    background-image: url('../images/X-bot.png');
+    background-size: 55%;
+}
